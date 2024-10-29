@@ -9,6 +9,9 @@ abstract class Routes {
   static const RECORD_SALES = _Paths.RECORD_SALES;
   static const PROFILE = _Paths.PROFILE;
   static const FLOWER_CARE_REMINDER = _Paths.FLOWER_CARE_REMINDER;
+  static const DETAIL_SALES_REPORT = _Paths.DETAIL_SALES_REPORT;
+  static const NOTIFICATION = _Paths.NOTIFICATION;
+  static const FLOWER_DETAIL = _Paths.FLOWER_DETAIL;
 }
 
 abstract class _Paths {
@@ -19,4 +22,7 @@ abstract class _Paths {
   static const RECORD_SALES = '/record-sales';
   static const PROFILE = '/profile';
   static const FLOWER_CARE_REMINDER = '/flower-care-reminder';
+  static const DETAIL_SALES_REPORT = '/detail-sales-report';
+  static const NOTIFICATION = '/notification';
+  static const FLOWER_DETAIL = '/flower-detail';
 }
