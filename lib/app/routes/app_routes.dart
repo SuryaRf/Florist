@@ -12,6 +12,7 @@ abstract class Routes {
   static const DETAIL_SALES_REPORT = _Paths.DETAIL_SALES_REPORT;
   static const NOTIFICATION = _Paths.NOTIFICATION;
   static const FLOWER_DETAIL = _Paths.FLOWER_DETAIL;
+  static const LOGIN = _Paths.LOGIN;
 }
 
 abstract class _Paths {
@@ -25,4 +26,5 @@ abstract class _Paths {
   static const DETAIL_SALES_REPORT = '/detail-sales-report';
   static const NOTIFICATION = '/notification';
   static const FLOWER_DETAIL = '/flower-detail';
+  static const LOGIN = '/login';
 }

@@ -36,7 +36,7 @@ class FlowerDetailPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              'Description goes here...', // Add any additional details you want.
+              'Menyusul....', 
               style: const TextStyle(fontSize: 16),
             ),
           ],
