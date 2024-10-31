@@ -1,4 +1,5 @@
 import 'package:florist/app/modules/notification/views/notification_view.dart';
+import 'package:florist/app/modules/record_sales/views/record_sales_view.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
@@ -24,7 +25,7 @@ class HomeView extends GetView<HomeController> {
           decoration: BoxDecoration(
             color: Colors.green,
             borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(10),
+              bottom: Radius.circular(5),
             ),
           ),
         ),
@@ -34,7 +35,7 @@ class HomeView extends GetView<HomeController> {
           child: Container(
             decoration: BoxDecoration(
                 border: Border.all(color: Colors.green.withOpacity(0.5)),
-                borderRadius: BorderRadius.circular(20)),
+                borderRadius: BorderRadius.circular(10)),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -167,7 +168,7 @@ class HomeView extends GetView<HomeController> {
                             // Aksi navigasi saat tombol ditekan
                             Navigator.of(context).push(
                               MaterialPageRoute(
-                                  builder: (context) => const HomeView()),
+                                  builder: (context) => const RecordSalesView()),
                             );
                           },
                           child: const Text(
@@ -260,7 +261,20 @@ class HomeView extends GetView<HomeController> {
                               ],
                             ),
                           ),
-                          // Add additional widget or info if needed.
+                          SizedBox(height: 7,),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: Container(
+                              width: width * 0.15,
+                              
+                              decoration: BoxDecoration(
+                                color: Colors.green.withOpacity(0.8),
+                                borderRadius: BorderRadius.circular(10),
+                                
+                              ),
+                              child: Icon(Icons.arrow_right_rounded, color: Colors.white,),
+                            ),
+                          )
                         ],
                       ),
                     ),

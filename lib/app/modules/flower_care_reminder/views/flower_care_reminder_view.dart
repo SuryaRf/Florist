@@ -138,7 +138,7 @@ class _FlowerCareReminderViewState extends State<FlowerCareReminderView> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Tugas Harian',
+              'Tugas',
               style: GoogleFonts.lato(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,

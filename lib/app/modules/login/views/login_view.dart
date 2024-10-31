@@ -49,7 +49,7 @@ class LoginView extends StatelessWidget {
     return FlutterLogin(
       theme: LoginTheme(
         
-        primaryColor: Colors.green,
+        primaryColor: const Color.fromARGB(255, 87, 218, 91),
         accentColor: Colors.yellow,
         errorColor: Colors.deepOrange,
       
@@ -57,6 +57,7 @@ class LoginView extends StatelessWidget {
           color: Colors.white,
           fontFamily: 'Poppins',
           letterSpacing: 4,
+          fontWeight: FontWeight.bold
         ),
          bodyStyle: const TextStyle(
           fontStyle: FontStyle.italic,
@@ -74,7 +75,8 @@ class LoginView extends StatelessWidget {
       ),
       
       title: 'Florist',
-      logo: const AssetImage('assets/images/ecorp-lightblue.png'), //belum ada foto nya
+      
+      logo: const AssetImage('lib/app/data/assets/icons/plant.png'), 
       onLogin: _authUser,
       onSignup: _signupUser,
       
@@ -82,6 +84,7 @@ class LoginView extends StatelessWidget {
           LoginProvider(
             
             icon: FontAwesomeIcons.google,
+            
             label: 'Google',
             callback: () async {
               debugPrint('start google sign in');
