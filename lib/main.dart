@@ -6,7 +6,11 @@ import 'app/routes/app_pages.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  if (Firebase.apps.isEmpty) {
+    await Firebase.initializeApp(
+        name: 'florist',
+        options: DefaultFirebaseOptions.currentPlatform);
+  }
   runApp(
     GetMaterialApp(
       debugShowCheckedModeBanner: false,
@@ -14,13 +18,13 @@ Future<void> main() async {
       initialRoute: AppPages.INITIAL,
       getPages: AppPages.routes,
       theme: ThemeData(
-        primarySwatch: Colors.green, 
+        primarySwatch: Colors.green,
       ),
       darkTheme: ThemeData(
-        primarySwatch: Colors.green, 
-        brightness: Brightness.dark, 
+        primarySwatch: Colors.green,
+        brightness: Brightness.dark,
       ),
-      themeMode: ThemeMode.system, 
+      themeMode: ThemeMode.system,
     ),
   );
 }

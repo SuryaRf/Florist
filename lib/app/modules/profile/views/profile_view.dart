@@ -10,6 +10,7 @@ class ProfileView extends GetView<ProfileController> {
     Get.put(ProfileController());
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         backgroundColor: Colors.green,
         elevation: 0,
         title: Text(
@@ -18,6 +19,7 @@ class ProfileView extends GetView<ProfileController> {
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
+          
         ),
         actions: [
           // Theme toggle button
@@ -54,50 +56,49 @@ class ProfileView extends GetView<ProfileController> {
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
-                    children: [
-                      // Profile Picture
-                      Stack(
-                        alignment: Alignment.bottomRight,
-                        children: [
-                          CircleAvatar(
-                            radius: 50,
-                            backgroundColor:Colors.green,
-                            child: IconButton(
-                              icon: const Icon(Icons.camera_alt, size: 24, color: Colors.white),
-                              onPressed: controller.updateProfileImage,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      // Admin Name
-                      Obx(() => Text(
-                            controller.adminName.value,
-                            style: TextStyle(color: Colors.black, fontSize: 20),
-                          )),
-                      const SizedBox(height: 8),
-                      // Role Badge
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.greenAccent.withOpacity(0.4),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          'Shop Administrator',
-                          style: TextStyle(
-                            color: Colors.green,
-                            fontWeight: FontWeight.bold,
+                  children: [
+                    // Profile Picture
+                    Stack(
+                      alignment: Alignment.bottomRight,
+                      children: [
+                        Obx(() => CircleAvatar(
+                          radius: 50,
+                          backgroundColor: Colors.green,
+                          backgroundImage: controller.currentUser.value.photoUrl != null
+                              ? NetworkImage(controller.currentUser.value.photoUrl!)
+                              : null,
+                          child: controller.currentUser.value.photoUrl == null
+                              ? Icon(Icons.person, size: 50, color: Colors.white)
+                              : null,
+                        )),
+                        CircleAvatar(
+                          radius: 18,
+                          backgroundColor: Colors.green,
+                          child: IconButton(
+                            icon: const Icon(Icons.camera_alt, size: 18, color: Colors.white),
+                            onPressed: controller.updateProfileImage,
                           ),
                         ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    // User Name
+                    Obx(() => Text(
+                      controller.currentUser.value.name,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
                       ),
-                    ],
-                  ),
-                ),
-              ),
+                    )),
+                    const SizedBox(height: 8),
+                    // User Email
+                    Obx(() => Text(
+                      controller.currentUser.value.email,
+                      style: TextStyle(
+                        color: Colors.grey,
+                      ),
+                    )),
+
               const SizedBox(height: 24),
               // Quick Stats
               Row(
@@ -183,6 +184,10 @@ class ProfileView extends GetView<ProfileController> {
           ),
         ),
       ),
+            ]
+          )
+        )
+      )
     );
   }
 
