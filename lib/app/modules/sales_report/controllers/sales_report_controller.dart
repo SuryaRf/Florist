@@ -1,23 +1,31 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:florist/app/data/model/report.dart';
 import 'package:get/get.dart';
 
 class SalesReportController extends GetxController {
-  //TODO: Implement SalesReportController
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final reports = <Report>[].obs;
 
-  final count = 0.obs;
   @override
   void onInit() {
     super.onInit();
+    fetchSalesReports();
   }
 
-  @override
-  void onReady() {
-    super.onReady();
+  void fetchSalesReports() async {
+    try {
+      final querySnapshot = await _firestore.collection('sales').get();
+      reports.value = querySnapshot.docs.map((doc) {
+        final data = doc.data();
+        return Report(
+          name: data['productName'],
+          date: (data['timestamp'] as Timestamp).toDate(),
+          amount: data['quantity'],
+          description: '',
+        );
+      }).toList();
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to load sales reports');
+    }
   }
-
-  @override
-  void onClose() {
-    super.onClose();
-  }
-
-  void increment() => count.value++;
 }

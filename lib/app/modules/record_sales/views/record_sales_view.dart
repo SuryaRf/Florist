@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import '../controllers/record_sales_controller.dart';
 
 class RecordSalesView extends GetView<RecordSalesController> {
@@ -102,38 +103,48 @@ class RecordSalesView extends GetView<RecordSalesController> {
   }
 
   // List of recorded sales with dynamic updates
-  Widget _buildSalesList() {
-    return Obx(() {
-      return ListView.builder(
-        itemCount: controller.sales.length,
-        itemBuilder: (context, index) {
-          final sale = controller.sales[index];
-          return Card(
-            margin: const EdgeInsets.symmetric(vertical: 8.0),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            child: ListTile(
-              leading: Icon(Icons.shopping_bag, color: Colors.green[400]),
-              title: Text(
-                sale.productName,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              subtitle:
-                  Text('Quantity: ${sale.quantity} • Price: Rp ${sale.price}'),
-              trailing: Text(
-                'Rp ${(sale.quantity * sale.price).toStringAsFixed(0)}',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.green[700],
+  // List of recorded sales with dynamic updates
+Widget _buildSalesList() {
+  return Obx(() {
+    return ListView.builder(
+      itemCount: controller.sales.length,
+      itemBuilder: (context, index) {
+        final sale = controller.sales[index];
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 8.0),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          child: ListTile(
+            leading: Icon(Icons.shopping_bag, color: Colors.green[400]),
+            title: Text(
+              sale.productName,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Quantity: ${sale.quantity} • Price: Rp ${sale.price}'),
+                Text(
+                  'Added: ${DateFormat('dd MMM yyyy, HH:mm').format(sale.timestamp)}',
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                 ),
+              ],
+            ),
+            trailing: Text(
+              'Rp ${(sale.quantity * sale.price).toStringAsFixed(0)}',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Colors.green[700],
               ),
             ),
-          );
-        },
-      );
-    });
-  }
+          ),
+        );
+      },
+    );
+  });
+}
+
 
   // Total amount section at the bottom
   Widget _buildTotalAmountSection() {
