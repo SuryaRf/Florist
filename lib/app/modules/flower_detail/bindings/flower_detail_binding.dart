@@ -5,8 +5,8 @@ import '../controllers/flower_detail_controller.dart';
 class FlowerDetailBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<FlowerDetailController>(
-      () => FlowerDetailController(),
+    Get.lazyPut<FlowerController>(
+      () => FlowerController(),
     );
   }
 }

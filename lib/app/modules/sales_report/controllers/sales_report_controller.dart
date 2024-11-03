@@ -21,7 +21,8 @@ class SalesReportController extends GetxController {
           name: data['productName'],
           date: (data['timestamp'] as Timestamp).toDate(),
           amount: data['quantity'],
-          description: '',
+          description: '', status: 
+          data['status'] ?? 'berhasil',
         );
       }).toList();
     } catch (e) {

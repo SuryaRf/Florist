@@ -1,3 +1,4 @@
+import 'package:florist/app/modules/flower_detail/controllers/flower_detail_controller.dart';
 import 'package:florist/app/modules/notification/views/notification_view.dart';
 import 'package:florist/app/modules/record_sales/views/record_sales_view.dart';
 import 'package:flutter/material.dart';
@@ -191,14 +192,14 @@ class HomeView extends GetView<HomeController> {
         SizedBox(
             height: 430,
             child: GridView.builder(
-              itemCount: flowers.length,
+              itemCount: FlowerController().flowers.length,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 20,
               ),
               itemBuilder: (context, index) {
-                final flower = flowers[index];
+                final flower = FlowerController().flowers[index];
                 return GestureDetector(
                   onTap: () {
                     Navigator.push(
