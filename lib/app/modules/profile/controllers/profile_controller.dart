@@ -81,6 +81,7 @@ class ProfileController extends GetxController {
   }
 
   void logout() {
+    
     // Implement logout logic
   }
 }

@@ -6,6 +6,8 @@ class SalesReportController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final reports = <Report>[].obs;
 
+  get fetchSalesReport => null;
+
   @override
   void onInit() {
     super.onInit();
@@ -19,7 +21,7 @@ class SalesReportController extends GetxController {
         final data = doc.data();
         return Report(
           name: data['productName'],
-          date: (data['timestamp'] as Timestamp).toDate(),
+          // date: (data['timestamp'] as Timestamp).toDate(),
           amount: data['quantity'],
           description: '', status: 
           data['status'] ?? 'berhasil',

@@ -124,10 +124,10 @@ Widget _buildSalesList() {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Quantity: ${sale.quantity} • Price: Rp ${sale.price}'),
-                Text(
-                  'Added: ${DateFormat('dd MMM yyyy, HH:mm').format(sale.timestamp)}',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                ),
+                // Text(
+                //   'Added: ${DateFormat('dd MMM yyyy, HH:mm').format(sale.timestamp)}',
+                //   style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                // ),
               ],
             ),
             trailing: Text(
