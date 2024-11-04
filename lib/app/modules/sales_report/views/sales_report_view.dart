@@ -83,6 +83,13 @@ class SalesReportView extends GetView<SalesReportController> {
                               fontSize: 13,
                             ),
                           ),
+                          // Text(
+                          //   'Jumlah: ${report.price}',
+                          //   style: const TextStyle(
+                          //     color: Colors.black,
+                          //     fontSize: 13,
+                          //   ),
+                          // ),
                          
                         ],
                       ),

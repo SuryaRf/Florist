@@ -196,7 +196,7 @@ class HomeView extends GetView<HomeController> {
           if (controller.isLoading.value) {
             return Center(child: CircularProgressIndicator());
           }
-
+          
           return RefreshIndicator(
             onRefresh: home.refreshData,
             child: SizedBox(
