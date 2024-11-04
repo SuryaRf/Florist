@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Flower {
+  final String id;
   final String name;
   final String description;
   final String image;
@@ -8,6 +9,7 @@ class Flower {
   final int stock;
 
   Flower({
+    required this.id,
     required this.name,
     required this.description,
     required this.image,
@@ -18,6 +20,7 @@ class Flower {
   factory Flower.fromFirestore(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
     return Flower(
+      id: doc.id,
       name: data['name'] ?? '',
       description: data['description'] ?? '',
       image: data['image'] ?? '',

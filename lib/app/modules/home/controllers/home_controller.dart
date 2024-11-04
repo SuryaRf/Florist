@@ -1,23 +1,33 @@
 import 'package:get/get.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../data/model/flower.dart';
 
 class HomeController extends GetxController {
-  //TODO: Implement HomeController
+  var flowers = <Flower>[].obs;
+  var isLoading = true.obs;
 
-  final count = 0.obs;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   @override
   void onInit() {
     super.onInit();
+    fetchFlowers();
   }
 
-  @override
-  void onReady() {
-    super.onReady();
+  Future<void> fetchFlowers() async {
+    try {
+      isLoading.value = true;
+      QuerySnapshot snapshot = await _firestore.collection('flowers').get();
+      flowers.value = snapshot.docs
+          .map((doc) => Flower.fromFirestore(doc))
+          .toList();
+    } finally {
+      isLoading.value = false;
+    }
   }
 
-  @override
-  void onClose() {
-    super.onClose();
+  // Fungsi untuk refresh data
+  Future<void> refreshData() async {
+    await fetchFlowers(); 
   }
-
-  void increment() => count.value++;
 }

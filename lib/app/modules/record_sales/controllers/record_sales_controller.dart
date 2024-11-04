@@ -19,8 +19,6 @@ class RecordSalesController extends GetxController {
   TextEditingController quantityController = TextEditingController();
   TextEditingController priceController = TextEditingController();
   var totalAmount = 0.0.obs;
-
-  // Reactive list of sales
   var sales = <Sale>[].obs;
 
   @override
@@ -28,18 +26,6 @@ class RecordSalesController extends GetxController {
     super.onInit();
     _loadSales();
   }
-
-  // Total amount calculation
-  // double get totalAmount => sales.fold(0, (sum, item) => sum + (item.quantity * item.price));
-  // Load sales from SQLite and update total amount
-  // Future<void> _loadSales() async {
-  //   final localSales = await DBHelper.insertSale(sale);
-  //   sales.addAll(localSales);
-  //   totalAmount.value = sales.fold(
-  //     0,
-  //     (sum, item) => sum + (item.quantity * item.price),
-  //   );
-  // }
 
   Future<void> _loadSales() async {
     final localSales = await DBHelper.getSales();
@@ -50,7 +36,36 @@ class RecordSalesController extends GetxController {
     );
   }
 
-  // Method to add a sale
+  // Fungsi untuk mengambil stok dari Firebase berdasarkan nama produk
+  Future<int> getFlowerStock(String flowerName) async {
+    final snapshot = await _firestore
+        .collection('flowers')
+        .where('name', isEqualTo: flowerName)
+        .get();
+    
+    if (snapshot.docs.isNotEmpty) {
+      return snapshot.docs.first['stock'];
+    }
+    return 0;
+  }
+
+  // Fungsi untuk memperbarui stok di Firebase
+  Future<void> updateFlowerStock(String flowerName, int quantitySold) async {
+    final snapshot = await _firestore
+        .collection('flowers')
+        .where('name', isEqualTo: flowerName)
+        .get();
+    
+    if (snapshot.docs.isNotEmpty) {
+      final docRef = snapshot.docs.first.reference;
+      final currentStock = snapshot.docs.first['stock'];
+      final newStock = currentStock - quantitySold;
+
+      await docRef.update({'stock': newStock});
+    }
+  }
+
+  // Fungsi untuk menambahkan penjualan dan mengupdate stok di Firebase
   void addSale() async {
     final productName = productNameController.text;
     final quantity = int.tryParse(quantityController.text) ?? 0;
@@ -61,20 +76,19 @@ class RecordSalesController extends GetxController {
         productName: productName,
         quantity: quantity,
         price: price,
-        // timestamp: DateTime.now(),
       );
       sales.add(newSale);
       totalAmount.value += newSale.quantity * newSale.price;
 
       await DBHelper.insertSale(newSale);
-
-      // Simpan data ke Firebase
       await _firestore.collection('sales').add({
         'productName': newSale.productName,
         'quantity': newSale.quantity,
         'price': newSale.price,
-        // 'timestamp': newSale.timestamp,
       });
+
+      // Update stok jika bunga tersedia
+      await updateFlowerStock(productName, quantity);
 
       // Clear input fields
       productNameController.clear();
@@ -83,7 +97,6 @@ class RecordSalesController extends GetxController {
     }
   }
 
-  // Clear text fields after adding a sale
   void clearFields() {
     productNameController.clear();
     quantityController.clear();

@@ -22,7 +22,7 @@ class SalesReportController extends GetxController {
         return Report(
           name: data['productName'],
           // date: (data['timestamp'] as Timestamp).toDate(),
-          amount: data['quantity'],
+          amount: data['price'],
           description: '', status: 
           data['status'] ?? 'berhasil',
         );

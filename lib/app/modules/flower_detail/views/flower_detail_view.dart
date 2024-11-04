@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../../data/model/flower.dart';
+import '../controllers/flower_detail_controller.dart';
 
 class FlowerDetailPage extends StatelessWidget {
   final Flower flower;
-
-  const FlowerDetailPage({Key? key, required this.flower}) : super(key: key);
+  final FlowerController controller = Get.put(FlowerController());
+  FlowerDetailPage({Key? key, required this.flower}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,21 +21,25 @@ class FlowerDetailPage extends StatelessWidget {
     );
 
     return Scaffold(
-      backgroundColor: Colors.grey[100],
-            appBar: AppBar(
-        title: const Text(
-          'Detail',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: Colors.white),
+        backgroundColor: Colors.grey[100],
+        appBar: AppBar(
+          title: const Text(
+            'Detail',
+            style: TextStyle(
+                fontSize: 22, fontWeight: FontWeight.w600, color: Colors.white),
+          ),
+          centerTitle: false,
+          backgroundColor: Colors.green[400],
+          elevation: 0,
+          leading: GestureDetector(
+              onTap: () => Navigator.of(context).pop(),
+              child: Icon(
+                Icons.arrow_back,
+                color: Colors.white,
+              )),
         ),
-        centerTitle: false,
-        backgroundColor: Colors.green[400],
-        elevation: 0,
-        leading: GestureDetector(
-          onTap: () => Navigator.of(context).pop(),
-          child: Icon(Icons.arrow_back, color: Colors.white,)),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
+        body: SingleChildScrollView(
+            child: Column(
           children: [
             // Image Section
             Container(
@@ -63,7 +69,7 @@ class FlowerDetailPage extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             // Content Section
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
@@ -95,7 +101,8 @@ class FlowerDetailPage extends StatelessWidget {
                         onRatingUpdate: (rating) {},
                       ),
                       const SizedBox(width: 8),
-                      Text("4.8 (268 Reviews)", style: TextStyle(color: Colors.grey[600])),
+                      Text("4.8 (268 Reviews)",
+                          style: TextStyle(color: Colors.grey[600])),
                     ],
                   ),
                   const SizedBox(height: 20),
@@ -115,10 +122,10 @@ class FlowerDetailPage extends StatelessWidget {
                 ],
               ),
             ),
-        
+
             // Bottom Container Section
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
@@ -134,45 +141,113 @@ class FlowerDetailPage extends StatelessWidget {
                 ],
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Text(
-                    currencyFormatter.format(flower.price),
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.green[700]),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green[400],
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 5,),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(30),
+                        topRight: Radius.circular(30),
                       ),
                     ),
-                    child: Text("Stok: ${flower.stock}", style: TextStyle(fontSize: 16, color: Colors.white)),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          currencyFormatter.format(flower.price),
+                          style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green[700]),
+                        ),
+                        SizedBox(width: 80,),
+                        
+                  
+                        Column(
+                          children: [
+                            Text("Stock: ${flower.stock}" ,style: TextStyle(fontSize: 16),),
+                            ElevatedButton(
+                              onPressed: () => _updateStockDialog(context),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green[400],
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 24, vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: Text("Update Stock",
+                                  style:
+                                      TextStyle(fontSize: 16, color: Colors.white)),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
           ],
-        ),
-      ),
-    );
+        )));
   }
 
-  Widget _buildInfoColumn(String label, String value) {
-    return Column(
-      children: [
-        Text(
-          label,
-          style: TextStyle(color: Colors.grey[600], fontSize: 14),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey[800]),
-        ),
-      ],
+  // Update stock dialog to allow stock input
+  Future<void> _updateStockDialog(BuildContext context) async {
+    final TextEditingController stockController = TextEditingController();
+
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Update Stock"),
+          content: TextField(
+            controller: stockController,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(hintText: "Enter new stock amount"),
+          ),
+          actions: [
+            TextButton(
+              child: Text("Cancel"),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: Text("Update"),
+              onPressed: () async {
+                int? newStock = int.tryParse(stockController.text);
+                if (newStock != null) {
+                  await controller.updateFlowerStock(flower.id, newStock);
+                  Navigator.of(context).pop(); // Close dialog
+                  Get.snackbar("Success", "Stock updated successfully");
+                } else {
+                  Get.snackbar("Error", "Please enter a valid stock number");
+                }
+              },
+            ),
+          ],
+        );
+      },
     );
   }
+}
+
+Widget _buildInfoColumn(String label, String value) {
+  return Column(
+    children: [
+      Text(
+        label,
+        style: TextStyle(color: Colors.grey[600], fontSize: 14),
+      ),
+      const SizedBox(height: 4),
+      Text(
+        value,
+        style: TextStyle(
+            fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey[800]),
+      ),
+    ],
+  );
 }

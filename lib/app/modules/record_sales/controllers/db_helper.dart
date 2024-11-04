@@ -56,4 +56,15 @@ class DBHelper {
       );
     });
   }
+
+  static Future<void> updateStock(String productName, int newStock) async {
+  final dbClient = await db;
+  await dbClient.update(
+    'flowers',
+    {'stock': newStock},
+    where: 'productName = ?',
+    whereArgs: [productName],
+  );
+}
+
 }

@@ -12,7 +12,9 @@ class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
   @override
   Widget build(BuildContext context) {
-    final FlowerController controller = Get.put(FlowerController());
+     final FlowerController controller = Get.put(FlowerController());
+     final HomeController home = Get.put(HomeController());
+    
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     int notificationCount = 5;
@@ -195,101 +197,104 @@ class HomeView extends GetView<HomeController> {
             return Center(child: CircularProgressIndicator());
           }
 
-          return SizedBox(
-            height: 430,
-            child: GridView.builder(
-              itemCount: controller.flowers.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 20,
-              ),
-              itemBuilder: (context, index) {
-                final flower = controller.flowers[index];
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => FlowerDetailPage(flower: flower),
-                      ),
-                    );
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.3),
-                            blurRadius: 5,
-                            spreadRadius: 2,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Container(
-                            width: double.infinity,
-                            child: Image.asset(
-                              flower.image,
-                              height: 100,
-                              fit: BoxFit.cover,
+          return RefreshIndicator(
+            onRefresh: home.refreshData,
+            child: SizedBox(
+              height: 430,
+              child: GridView.builder(
+                itemCount: controller.flowers.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 20,
+                ),
+                itemBuilder: (context, index) {
+                  final flower = controller.flowers[index];
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => FlowerDetailPage(flower: flower),
+                        ),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.3),
+                              blurRadius: 5,
+                              spreadRadius: 2,
+                              offset: const Offset(0, 3),
                             ),
-                          ),
-                          const SizedBox(height: 15),
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 10.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    flower.name,
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              child: Image.asset(
+                                flower.image,
+                                height: 100,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            const SizedBox(height: 15),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      flower.name,
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'Stok: ${flower.stock}',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    color: Colors.grey.shade600,
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    'Stok: ${flower.stock}',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: Colors.grey.shade600,
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 7),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 10),
-                            child: Container(
-                              width: 50,
-                              decoration: BoxDecoration(
-                                color: Colors.green.withOpacity(0.8),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Icon(
-                                Icons.arrow_right_rounded,
-                                color: Colors.white,
+                                ],
                               ),
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 7),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 10),
+                              child: Container(
+                                width: 50,
+                                decoration: BoxDecoration(
+                                  color: Colors.green.withOpacity(0.8),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(
+                                  Icons.arrow_right_rounded,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           );
         }),
