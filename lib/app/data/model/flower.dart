@@ -1,36 +1,32 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Flower {
-  final String id; // Add this
   final String name;
-  final String image;
   final String description;
+  final String image;
+  final int price;
   final int stock;
-  final double price;
 
-  // Update the constructor to include `id`
   Flower({
-    required this.id,
     required this.name,
-    required this.image,
     required this.description,
-    required this.stock,
+    required this.image,
     required this.price,
+    required this.stock,
   });
 
-  // Factory method to create `Flower` from Firestore document
   factory Flower.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
     return Flower(
-      id: doc.id,
       name: data['name'] ?? '',
-      image: data['image'] ?? '',
       description: data['description'] ?? '',
+      image: data['image'] ?? '',
+      price: data['price'] ?? 0,
       stock: data['stock'] ?? 0,
-      price: (data['price'] ?? 0).toDouble(),
     );
   }
 }
+
 
 
 

@@ -2,10 +2,9 @@ import 'package:florist/app/modules/flower_detail/controllers/flower_detail_cont
 import 'package:florist/app/modules/notification/views/notification_view.dart';
 import 'package:florist/app/modules/record_sales/views/record_sales_view.dart';
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
 import 'package:iconly/iconly.dart';
-import '../../../data/model/flower.dart';
+
 import '../../flower_detail/views/flower_detail_view.dart';
 import '../controllers/home_controller.dart';
 
@@ -13,6 +12,7 @@ class HomeView extends GetView<HomeController> {
   const HomeView({super.key});
   @override
   Widget build(BuildContext context) {
+    final FlowerController controller = Get.put(FlowerController());
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     int notificationCount = 5;
@@ -169,7 +169,8 @@ class HomeView extends GetView<HomeController> {
                             // Aksi navigasi saat tombol ditekan
                             Navigator.of(context).push(
                               MaterialPageRoute(
-                                  builder: (context) => const RecordSalesView()),
+                                  builder: (context) =>
+                                      const RecordSalesView()),
                             );
                           },
                           child: const Text(
@@ -189,24 +190,30 @@ class HomeView extends GetView<HomeController> {
         SizedBox(
           height: 20,
         ),
-        SizedBox(
+        Obx(() {
+          if (controller.isLoading.value) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          return SizedBox(
             height: 430,
             child: GridView.builder(
-              itemCount: FlowerController().flowers.length,
+              itemCount: controller.flowers.length,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 20,
               ),
               itemBuilder: (context, index) {
-                final flower = FlowerController().flowers[index];
+                final flower = controller.flowers[index];
                 return GestureDetector(
                   onTap: () {
                     Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                FlowerDetailPage(flower: flower)));
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => FlowerDetailPage(flower: flower),
+                      ),
+                    );
                   },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -227,10 +234,10 @@ class HomeView extends GetView<HomeController> {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Container(
-                            width: width,
+                            width: double.infinity,
                             child: Image.asset(
                               flower.image,
-                              height: 120,
+                              height: 100,
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -262,27 +269,30 @@ class HomeView extends GetView<HomeController> {
                               ],
                             ),
                           ),
-                          SizedBox(height: 7,),
+                          const SizedBox(height: 7),
                           Padding(
                             padding: const EdgeInsets.only(right: 10),
                             child: Container(
-                              width: width * 0.15,
-                              
+                              width: 50,
                               decoration: BoxDecoration(
                                 color: Colors.green.withOpacity(0.8),
                                 borderRadius: BorderRadius.circular(10),
-                                
                               ),
-                              child: Icon(Icons.arrow_right_rounded, color: Colors.white,),
+                              child: const Icon(
+                                Icons.arrow_right_rounded,
+                                color: Colors.white,
+                              ),
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ),
                   ),
                 );
               },
-            )),
+            ),
+          );
+        }),
       ]),
     )));
   }

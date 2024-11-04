@@ -81,7 +81,7 @@ class ProfileController extends GetxController {
   }
 
   void logout() {
-    
+    Get.offNamed('/login');
     // Implement logout logic
   }
 }
