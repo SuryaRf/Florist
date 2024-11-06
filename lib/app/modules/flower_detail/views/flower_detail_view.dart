@@ -8,6 +8,7 @@ import '../controllers/flower_detail_controller.dart';
 class FlowerDetailPage extends StatelessWidget {
   final Flower flower;
   final FlowerController controller = Get.put(FlowerController());
+
   FlowerDetailPage({Key? key, required this.flower}) : super(key: key);
 
   @override
@@ -19,6 +20,13 @@ class FlowerDetailPage extends StatelessWidget {
       symbol: 'Rp ',
       decimalDigits: 0,
     );
+
+    // Show an alert dialog if stock is below 5
+    if (flower.stock < 5) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showLowStockAlert(context);
+      });
+    }
 
     return Scaffold(
         backgroundColor: Colors.grey[100],
@@ -208,11 +216,11 @@ class FlowerDetailPage extends StatelessWidget {
           content: TextField(
             controller: stockController,
             keyboardType: TextInputType.number,
-            decoration: InputDecoration(hintText: "Enter new stock amount"),
+            decoration: InputDecoration(hintText: "Masukan jumlah stok terbaru"),
           ),
           actions: [
             TextButton(
-              child: Text("Cancel"),
+              child: Text("Batalkan"),
               onPressed: () => Navigator.of(context).pop(),
             ),
             TextButton(
@@ -222,9 +230,9 @@ class FlowerDetailPage extends StatelessWidget {
                 if (newStock != null) {
                   await controller.updateFlowerStock(flower.id, newStock);
                   Navigator.of(context).pop(); // Close dialog
-                  Get.snackbar("Success", "Stock updated successfully");
+                  Get.snackbar("Sukses", "Stok berhasil terupdate");
                 } else {
-                  Get.snackbar("Error", "Please enter a valid stock number");
+                  Get.snackbar("Error", "Masukan jumlah stok valid");
                 }
               },
             ),
@@ -233,7 +241,84 @@ class FlowerDetailPage extends StatelessWidget {
       },
     );
   }
+
+  // Show alert dialog for low stock
+ void _showLowStockAlert(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 10,
+                offset: Offset(0, 5),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.warning_amber_rounded,
+                color: Colors.green,
+                size: 48,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                "Peringatan Stok Rendah",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[800],
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                "Stok untuk bunga ini di bawah 5. Harap segera perbarui stok.",
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey[600],
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  child: Text(
+                    "OK",
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
 }
+
 
 Widget _buildInfoColumn(String label, String value) {
   return Column(
@@ -250,4 +335,5 @@ Widget _buildInfoColumn(String label, String value) {
       ),
     ],
   );
+}
 }
