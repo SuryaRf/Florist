@@ -1,4 +1,9 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:florist/app/modules/flower_care_reminder/services/notificationservices.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconly/iconly.dart';
 import 'package:intl/intl.dart';
@@ -12,32 +17,54 @@ class FlowerCareReminderView extends StatefulWidget {
 
 class _FlowerCareReminderViewState extends State<FlowerCareReminderView> {
   DateTime selectedDate = DateTime.now();
-  List<Map<String, dynamic>> tasks = [
-    {
-      'status': 'Harian',
-      'title': 'Menyiram Tanaman',
-      'time': '10:00 - 11:00 WIB',
-      'color': Colors.purple
-    },
-    {
-      'status': 'Harian',
-      'title': 'Mengecek Kondisi',
-      'time': '12:00 - 13:00 WIB',
-      'color': Colors.orange
-    },
-    {
-      'status': '3 Hari',
-      'title': 'Menghitung Stok',
-      'time': '16:00 - 16:45 WIB',
-      'color': Colors.blue
-    },
-    {
-      'status': '1 Minggu',
-      'title': 'Belanja Stok',
-      'time': '04:00 - 05:00 WIB',
-      'color': Colors.pink
-    },
-  ];
+  List<Map<String, dynamic>> tasks = [];
+  Timer? reminderTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _startReminderChecker();
+  }
+
+  @override
+  void dispose() {
+    reminderTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startReminderChecker() {
+    reminderTimer = Timer.periodic(const Duration(minutes: 1), (timer) {
+      DateTime now = DateTime.now();
+      for (var task in tasks) {
+        // Cek jika waktu pengingat sesuai dengan waktu saat ini
+        if (task.containsKey('scheduledTime') &&
+            task['scheduledTime'].hour == now.hour &&
+            task['scheduledTime'].minute == now.minute) {
+          _showReminder(task['title']);
+        }
+      }
+    });
+  }
+
+  // void _showReminder(String title) {
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(
+  //       content: Text("Waktunya $title"),
+  //       duration: const Duration(seconds: 5),
+  //     ),
+  //   );
+  // }
+  void _showReminder(String title) {
+    Get.snackbar(
+      'Reminder',
+      'Waktunya $title',
+      snackPosition: SnackPosition.TOP,
+      backgroundColor: Colors.grey,
+      colorText: Colors.black,
+      icon: Icon(IconlyLight.notification),
+      duration: const Duration(seconds: 5),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,12 +87,7 @@ class _FlowerCareReminderViewState extends State<FlowerCareReminderView> {
           showAddTaskDialog(context);
         },
         backgroundColor: Colors.green.withOpacity(0.8),
-        child: Icon(
-          Icons.add, 
-          color: Colors.white,
-        ),
-        shape: CircleBorder(), 
-        mini: false, 
+        child: const Icon(Icons.add, color: Colors.white),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -147,36 +169,45 @@ class _FlowerCareReminderViewState extends State<FlowerCareReminderView> {
             ),
             const SizedBox(height: 8),
             Expanded(
-              child: ListView.builder(
-                itemCount: tasks.length,
-                itemBuilder: (context, index) {
-                  final task = tasks[index];
-                  return Dismissible(
-                    key: UniqueKey(),
-                    direction: DismissDirection.endToStart,
-                    onDismissed: (direction) {
-                      setState(() {
-                        tasks.removeAt(index);
-                      });
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("${task['title']} dihapus")),
-                      );
-                    },
-                    background: Container(
-                      color: Colors.red,
-                      alignment: Alignment.centerRight,
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: const Icon(Icons.delete, color: Colors.white),
+              child: tasks.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.assignment_outlined,
+                              size: 64, color: Colors.grey[400]),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Belum ada tugas',
+                            style: GoogleFonts.lato(
+                              fontSize: 16,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Tekan tombol + untuk menambah tugas baru',
+                            style: GoogleFonts.lato(
+                              fontSize: 14,
+                              color: Colors.grey[500],
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: tasks.length,
+                      itemBuilder: (context, index) {
+                        final task = tasks[index];
+                        return buildTaskCard(
+                          task['status'],
+                          task['title'],
+                          task['time'],
+                          task['color'],
+                          index,
+                        );
+                      },
                     ),
-                    child: buildTaskCard(
-                      task['status'],
-                      task['title'],
-                      task['time'],
-                      task['color'],
-                    ),
-                  );
-                },
-              ),
             ),
           ],
         ),
@@ -188,6 +219,7 @@ class _FlowerCareReminderViewState extends State<FlowerCareReminderView> {
     final _statusController = TextEditingController();
     final _titleController = TextEditingController();
     final _timeController = TextEditingController();
+    TimeOfDay? selectedTime;
 
     showDialog(
       context: context,
@@ -197,41 +229,73 @@ class _FlowerCareReminderViewState extends State<FlowerCareReminderView> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(
-                controller: _statusController,
+              DropdownButtonFormField<String>(
                 decoration: const InputDecoration(labelText: "Status"),
+                items: const [
+                  DropdownMenuItem(value: "Harian", child: Text("Harian")),
+                  DropdownMenuItem(value: "3 Hari", child: Text("3 Hari")),
+                  DropdownMenuItem(value: "1 Minggu", child: Text("1 Minggu")),
+                ],
+                onChanged: (String? newValue) {
+                  if (newValue != null) {
+                    _statusController.text = newValue;
+                  }
+                },
               ),
               TextField(
                 controller: _titleController,
                 decoration: const InputDecoration(labelText: "Judul Tugas"),
               ),
-              TextField(
-                controller: _timeController,
-                decoration: const InputDecoration(
-                    labelText: "Waktu (e.g., 10:00 - 11:00 WIB)"),
+              GestureDetector(
+                onTap: () async {
+                  final TimeOfDay? pickedTime = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay.now(),
+                  );
+                  if (pickedTime != null) {
+                    selectedTime = pickedTime;
+                    _timeController.text = "${pickedTime.format(context)} WIB";
+                  }
+                },
+                child: TextField(
+                  controller: _timeController,
+                  enabled: false,
+                  decoration: const InputDecoration(
+                    labelText: "Waktu",
+                    suffixIcon: Icon(Icons.access_time),
+                  ),
+                ),
               ),
             ],
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: () => Navigator.of(context).pop(),
               child: const Text("Batal", style: TextStyle(color: Colors.green)),
             ),
             TextButton(
               onPressed: () {
-                setState(() {
-                  tasks.add({
-                    'status': _statusController.text,
-                    'title': _titleController.text,
-                    'time': _timeController.text,
-                    'color': Colors.blue, 
+                if (selectedTime != null && _statusController.text.isNotEmpty) {
+                  setState(() {
+                    tasks.add({
+                      'status': _statusController.text,
+                      'title': _titleController.text,
+                      'time': _timeController.text,
+                      'color': Colors.blue,
+                      'scheduledTime': DateTime(
+                        selectedDate.year,
+                        selectedDate.month,
+                        selectedDate.day,
+                        selectedTime!.hour,
+                        selectedTime!.minute,
+                      ),
+                    });
                   });
-                });
-                Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                }
               },
-              child: const Text("Tambah",style: TextStyle(color: Colors.green),),
+              child:
+                  const Text("Tambah", style: TextStyle(color: Colors.green)),
             ),
           ],
         );
@@ -239,71 +303,59 @@ class _FlowerCareReminderViewState extends State<FlowerCareReminderView> {
     );
   }
 
-  Widget buildTaskCard(String status, String title, String time, Color color) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(12),
+  Widget buildTaskCard(String status, String title, String time, Color color, int index) {
+    return Dismissible(
+      background: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: Colors.red,
+        ),
+        
+        child: const Icon(Icons.delete, color: Colors.white),
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 16),
       ),
-      child: Row(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                child: Text(
-                  status,
-                  style: GoogleFonts.lato(color: Colors.white, fontSize: 12),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                title,
-                style: GoogleFonts.lato(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Row(
+      key: UniqueKey(),
+      onDismissed: (direction) {
+        setState(() {
+          tasks.removeAt(index);
+        });
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8.0),
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.2),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.access_time, size: 16, color: Colors.grey),
-                  const SizedBox(width: 4),
+                  Text(
+                    status,
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 4),
                   Text(
                     time,
-                    style: GoogleFonts.lato(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
+                    style: const TextStyle(color: Colors.grey),
                   ),
                 ],
               ),
-            ],
-          ),
-          const Spacer(),
-          Stack(
-            children: [
-              CircleAvatar(backgroundColor: Colors.grey[300], radius: 12),
-              Positioned(
-                  left: 15,
-                  child: CircleAvatar(
-                      backgroundColor: Colors.grey[400], radius: 12)),
-              Positioned(
-                  left: 30,
-                  child: CircleAvatar(
-                      backgroundColor: Colors.grey[500], radius: 12)),
-            ],
-          ),
-        ],
+            ),
+            Icon(Icons.access_time, color: color, size: 32),
+          ],
+        ),
       ),
     );
   }

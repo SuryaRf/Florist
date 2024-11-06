@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+
 import '../../../data/model/flower.dart';
 import '../controllers/flower_detail_controller.dart';
 
@@ -153,7 +154,8 @@ class FlowerDetailPage extends StatelessWidget {
                 children: [
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 5,),
+                      horizontal: 5,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
@@ -172,25 +174,28 @@ class FlowerDetailPage extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                               color: Colors.green[700]),
                         ),
-                        SizedBox(width: 80,),
-                        
-                  
+                        SizedBox(
+                          width: 80,
+                        ),
                         Column(
                           children: [
-                            Text("Stock: ${flower.stock}" ,style: TextStyle(fontSize: 16),),
+                            Text(
+                              "Stock: ${flower.stock}",
+                              style: TextStyle(fontSize: 16),
+                            ),
                             ElevatedButton(
                               onPressed: () => _updateStockDialog(context),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.green[400],
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 24, vertical: 12),
+                                    horizontal: 13, vertical: 2),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
                               child: Text("Update Stock",
-                                  style:
-                                      TextStyle(fontSize: 16, color: Colors.white)),
+                                  style: TextStyle(
+                                      fontSize: 16, color: Colors.white)),
                             ),
                           ],
                         ),
@@ -216,7 +221,8 @@ class FlowerDetailPage extends StatelessWidget {
           content: TextField(
             controller: stockController,
             keyboardType: TextInputType.number,
-            decoration: InputDecoration(hintText: "Masukan jumlah stok terbaru"),
+            decoration:
+                InputDecoration(hintText: "Masukan jumlah stok terbaru"),
           ),
           actions: [
             TextButton(
@@ -243,97 +249,98 @@ class FlowerDetailPage extends StatelessWidget {
   }
 
   // Show alert dialog for low stock
- void _showLowStockAlert(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
+  void _showLowStockAlert(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 10,
-                offset: Offset(0, 5),
-              ),
-            ],
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.warning_amber_rounded,
-                color: Colors.green,
-                size: 48,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                "Peringatan Stok Rendah",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey[800],
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: Offset(0, 5),
                 ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                "Stok untuk bunga ini di bawah 5. Harap segera perbarui stok.",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey[600],
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.warning_amber_rounded,
+                  color: Colors.green,
+                  size: 48,
                 ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                const SizedBox(height: 16),
+                Text(
+                  "Peringatan Stok Rendah",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[800],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  "Stok untuk bunga ini di bawah 5. Harap segera perbarui stok.",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey[600],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
-                  child: Text(
-                    "OK",
-                    style: TextStyle(fontSize: 16, color: Colors.white),
+                    child: Text(
+                      "OK",
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
+        );
+      },
+    );
+  }
+
+  Widget _buildInfoColumn(String label, String value) {
+    return Column(
+      children: [
+        Text(
+          label,
+          style: TextStyle(color: Colors.grey[600], fontSize: 14),
         ),
-      );
-    },
-  );
-}
-
-
-Widget _buildInfoColumn(String label, String value) {
-  return Column(
-    children: [
-      Text(
-        label,
-        style: TextStyle(color: Colors.grey[600], fontSize: 14),
-      ),
-      const SizedBox(height: 4),
-      Text(
-        value,
-        style: TextStyle(
-            fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey[800]),
-      ),
-    ],
-  );
-}
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey[800]),
+        ),
+      ],
+    );
+  }
 }
